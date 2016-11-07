@@ -6,6 +6,13 @@
 <ul>
   <% @todos.each do |t| %>
     <li>
+      <%= link_to toggle_todo_path(t) do %>
+        <% if t.complete %>
+          <i class="fa fa-check-square-o" aria-hidden="true"></i>
+        <% else %>
+            <i class="fa fa-square-o" aria-hidden="true"></i>
+        <% end %>
+      <% end %>
       <%= t.item %>
       <%= link_to '수정', edit_todo_path(t) %>
       <%= link_to '삭제', todo_path(t), method: :delete %>

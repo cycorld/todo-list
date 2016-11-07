@@ -23,4 +23,11 @@ class TodosController < ApplicationController
     todo.update(item: params[:item])
     redirect_to root_path
   end
+
+  def toggle
+    todo = Todo.find(params[:id])
+    todo.complete = !todo.complete
+    todo.save
+    redirect_to root_path
+  end
 end
