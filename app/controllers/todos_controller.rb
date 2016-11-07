@@ -2,11 +2,11 @@ class TodosController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @todos = Todo.all
+    @todos = current_user.todos
   end
 
   def create
-    Todo.create(item: params[:item], complete: false)
+    Todo.create(item: params[:item], complete: false, user: current_user)
     redirect_back fallback_location: root_path
   end
 
