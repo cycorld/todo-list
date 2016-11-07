@@ -13,4 +13,8 @@ class TodosController < ApplicationController
     todo.destroy
     redirect_back fallback_location: root_path
   end
+
+  def edit
+    @todo = Todo.find(params[:id])
+  end
 end

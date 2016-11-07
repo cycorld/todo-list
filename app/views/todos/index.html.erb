@@ -7,6 +7,7 @@
   <% @todos.each do |t| %>
     <li>
       <%= t.item %>
+      <%= link_to '수정', edit_todo_path(t) %>
       <%= link_to '삭제', todo_path(t), method: :delete %>
     </li>
   <% end %>

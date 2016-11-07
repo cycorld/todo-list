@@ -1,0 +1,4 @@
+<%= form_tag todo_path(@todo), method: :patch do %>
+  <%= text_field_tag :item, @todo.item, placeholder: "새로운 할 일", autofocus: true %>
+  <%= submit_tag "수정" %>
+<% end %>
