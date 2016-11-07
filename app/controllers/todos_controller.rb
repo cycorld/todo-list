@@ -7,4 +7,10 @@ class TodosController < ApplicationController
     Todo.create(item: params[:item], complete: false)
     redirect_back fallback_location: root_path
   end
+
+  def destroy
+    todo = Todo.find(params[:id])
+    todo.destroy
+    redirect_back fallback_location: root_path
+  end
 end

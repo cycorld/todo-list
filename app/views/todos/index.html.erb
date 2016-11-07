@@ -5,6 +5,9 @@
 <% end %>
 <ul>
   <% @todos.each do |t| %>
-    <li><%= t.item %></li>
+    <li>
+      <%= t.item %>
+      <%= link_to '삭제', todo_path(t), method: :delete %>
+    </li>
   <% end %>
 </ul>
