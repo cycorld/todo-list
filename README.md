@@ -542,3 +542,52 @@
      end
     ```
 
+## 수정 기능 ajax 로 처리하기
+
+1. item을 span tag로 감싸기
+
+    `app/views/todos/index.html.erb`
+
+    ```html
+             <% if t.complete %>
+               <i class="fa fa-check-square-o" aria-hidden="true"></i>
+             <% else %>
+               <i class="fa fa-square-o" aria-hidden="true"></i>
+             <% end %>
+           <% end %>
+    -      <%= t.item %>
+    +      <span data-id="<%= t.id %>" class="item"><%= t.item %></span>
+           <%= link_to '수정', edit_todo_path(t) %>
+           <%= link_to '삭제', todo_path(t), method: :delete %>
+         </li>
+    ```
+
+1. javascript 코드 작성하기
+
+    `app/assets/javascripts/todos.coffee`를 `app/assets/javascripts/todos.js`로 수정하기
+
+    주석을 모두 제거하기
+
+    ```javascript
+    $(document).on('turbolinks:load', function() {
+      $('.item').bind('dblclick', function() {
+        $(this).attr('contentEditable', true)
+          .keypress(function(e) {
+            if (e.which == 13) {
+              $.ajax({url: '/todos/' + $(this).data('id'),
+                     type: 'patch',
+                     data: {item: $(this).text()}});
+              return false;
+            }
+          });
+      }).blur(function() {
+        $(this).attr('contentEditable', false);
+      });
+    });
+    ```
+
+1. jQuery <=> javascript
+
+    - 참고자료 : [You might not need jQuery](http://youmightnotneedjquery.com/)
+
+
