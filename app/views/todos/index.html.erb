@@ -10,10 +10,10 @@
         <% if t.complete %>
           <i class="fa fa-check-square-o" aria-hidden="true"></i>
         <% else %>
-            <i class="fa fa-square-o" aria-hidden="true"></i>
+          <i class="fa fa-square-o" aria-hidden="true"></i>
         <% end %>
       <% end %>
-      <%= t.item %>
+      <span data-id="<%= t.id %>" class="item"><%= t.item %></span>
       <%= link_to '수정', edit_todo_path(t) %>
       <%= link_to '삭제', todo_path(t), method: :delete %>
     </li>
