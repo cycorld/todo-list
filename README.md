@@ -11,9 +11,9 @@
 
 - [OS별 설치 가이드 : installrails.com](http://installrails.com/)
 - 에디터는 [Atom](https://atom.io/), [Sublime Text](https://www.sublimetext.com/) 등 추천 (웹 개발은 Vim 또는 Emacs 사용 권장)
+- 레일즈 버전 확인 : `$ rails -v`
 
-
-## 간단한 TODO 리스트 만들기
+## 레일즈 프로젝트 생성하기
 
 1. 프로젝트 생성하기
 
@@ -28,7 +28,24 @@
     $ rails s
     ```
 
+    http://localhost:3000 에서 확인 가능
+
+## Scaffold를 이용해 Rails 구조 살펴보기
+
+```
+$ rails g scaffold Post title:string content:text
+$ rake db:migrate
+```
+
+`http://localhost:3000/posts` 에서 확인
+
+![레일즈 구조](./mvc.png)
+
+## 간단한 TODO 리스트 만들기
+
 1. Todo 모델 생성하기
+
+    내용을 담을 item (string 타입)과 투두 완료 상태를 담을 complete (boolean 타입)을 컬럼으로 생성합니다.
 
     ```bash
     $ rails g model Todo item:string complete:boolean
@@ -51,13 +68,37 @@
          end
     ```
 
+    complete의 경우 default 값을 false로 지정하고 item의 경우 반드시 내용이 있도록 DB를 세팅합니다.
+
 1. todos 테이블 생성하기
+
+    마이그레이션 파일을 토대로 DB에 테이블을 생성합니다.
 
     ```bash
     $ rake db:migrate
     ```
 
+    `$ rails console` 또는 `$ rails c` 명령어를 통해 레일즈 콘솔을 이용할 수 있습니다.
+
+    콘솔에서 todo를 몇 가지 생성하고 조회해 보겠습니다.
+
+    ```ruby
+    Todo.create(item: '첫번째 할 일', complete: false)
+    Todo.create(item: '두번째 할 일', complete: false)
+    Todo.create(item: '세번째 할 일', complete: true)
+    a = Todo.find(1)
+    b = Todo.find(2)
+    b.complete = true
+    b.save
+    Todo.all
+    Todo.where(complete: true)
+    ```
+
+    [액티브레코드 쿼리 인터페이스](http://rubykr.github.io/rails_guides/active_record_querying.html)
+
 1. Todos 컨트롤러 생성하기
+
+    Todos 컨트롤러를 생성하고 컨트롤러 속에 index 액션을 추가합니다. 액션은 사용자의 요청을 처리하는 하나의 단위 이며 Todos 컨트롤러(클래스)에 index 메소드를 정의합니다. 그리고 app/views/todos/index.html.erb 파일을 자동 생성합니다.
 
     ```bash
     $ rails g controller Todos index
@@ -125,6 +166,8 @@
      end
     ```
 
+    root '[컨트롤러]#[액션]' 은 홈페이지를 지정하는 것이며 root_path라는 별칭을 가집니다. `$ rake routes` 명령어로 라우트 규칙을 확인할 수 있습니다.
+
 1. Todos 컨트롤러의 index 액션에서 전체 Todo 내용 불러오기
 
     `app/controllers/todos_controller.rb`
@@ -136,6 +179,8 @@
        end
      end
     ```
+
+    .all 메소드를 이용해 Todo 모델에서 모든 데이터를 불러옵니다. @todos 변수는 인스턴스 변수로 view에서 활용할 수 있게 됩니다.
 
 1. View에 전체 리스트 출력하기
 
@@ -152,6 +197,8 @@
     +</ul>
     ```
 
+    `<% %>` 속에 루비코드를 작성할 수 있습니다. 리턴값 출력을 원할 경우 `<%= %>`를 사용합니다.
+
 1. 새로운 TODO 작성을 위한 Form
 
     `app/views/todos/index.html.erb`
@@ -166,6 +213,8 @@
        <% @todos.each do |t| %>
          <li><%= t.item %></li>
     ```
+
+    form tag 헬퍼를 이용하면 csrf 공격 방어를 위한 코드를 자동생성 해줍니다.
 
 1. DB에 todo를 저장하기 위한 create 액션 작성하기
 
@@ -182,6 +231,8 @@
     +  end
      end
     ```
+
+    rails 4 버전의 경우 `redirect_back fallback_location: root_path` 대신 `redirect_to :back` 코드를 사용합니다.
 
 1. 삭제 링크 만들기
 
@@ -272,6 +323,39 @@
      end
     ```
 
+1. toggle 라우트 추가하기
+
+    `config/routes.rb`
+
+    ```erb
+     Rails.application.routes.draw do
+       root 'todos#index'
+    -  resources :todos
+    +  resources :todos do
+    +    member do
+    +      get 'toggle'
+    +    end
+    +  end
+
+       # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+     end
+    ```
+
+    [rails 라우트 한글 가이드](http://guides.rorlab.org/routing.html)
+
+1. [CDN에서 Font Awesome](https://www.bootstrapcdn.com/fontawesome/) 불러오기
+
+    `app/views/layouts/application.html.erb`
+
+    ```erb
+         <%= csrf_meta_tags %>
+
+         <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    +    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css
+         <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+       </head>
+    ```
+
 1. 체크 토글 버튼 추가하기 : [Font Awesome](http://fontawesome.io/icons/) 사용하여 아이콘 표현
 
     `app/views/todos/index.html.erb`
@@ -290,37 +374,6 @@
            <%= t.item %>
            <%= link_to '수정', edit_todo_path(t) %>
            <%= link_to '삭제', todo_path(t), method: :delete %>
-    ```
-
-1. [CDN에서 Font Awesome](https://www.bootstrapcdn.com/fontawesome/) 불러오기
-
-    `app/views/layouts/application.html.erb`
-
-    ```erb
-         <%= csrf_meta_tags %>
-
-         <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    +    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css
-         <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
-       </head>
-    ```
-
-1. toggle 라우트 추가하기
-
-    `config/routes.rb`
-
-    ```erb
-     Rails.application.routes.draw do
-       root 'todos#index'
-    -  resources :todos
-    +  resources :todos do
-    +    member do
-    +      get 'toggle'
-    +    end
-    +  end
-
-       # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
-     end
     ```
 
 1. toggle 액션 기능 구현하기
@@ -446,6 +499,8 @@
      end
     ```
 
+    앞으로 todo 객체에서 `.user` 메소드를 사용할 수 있게 됩니다. 해당 todo를 작성한 user 객체를 호출할 수 있습니다.
+
     `app/models/user.rb`
 
     ```ruby
@@ -457,6 +512,7 @@
     +  has_many :todos
      end
     ```
+    앞으로 user 객체에서 `.todos` 메소드를 사용할 수 있게 됩니다. 해당 user가 작성한 todo 객체들의 배열을 가져 옵니다.
 
 1. 사용자의 Todo만 보여주기
 
